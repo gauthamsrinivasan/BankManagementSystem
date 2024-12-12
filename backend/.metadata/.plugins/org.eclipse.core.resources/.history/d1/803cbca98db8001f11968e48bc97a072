@@ -1,0 +1,5 @@
+package com.BankManagement.Backend.controller;
+
+public class AuthController {
+
+}

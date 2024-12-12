@@ -1,0 +1,38 @@
+package com.BankManagement.Backend.controller;
+
+import com.bms.model.User;
+import com.bms.repository.UserRepository;
+import com.bms.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody User user) {
+        User dbUser = userRepository.findByUsername(user.getUsername())
+                                     .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+        if (passwordEncoder.matches(user.getPassword(), dbUser.getPassword())) {
+            String token = jwtUtil.generateToken(dbUser.getUsername());
+            return ResponseEntity.ok(token);
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+    }
+}
