@@ -209,4 +209,57 @@ transactions.comp.html
     </table>
   </div>
 </div>
+---------------------
+user-modal-comp.ts
+--------
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+@Component({
+  selector: 'app-user-modal',
+  templateUrl: './user-modal.component.html',
+  styleUrls: ['./user-modal.component.css'], // Adjust based on your CSS setup
+})
+export class UserModalComponent {
+  // Input property to receive the user object
+  @Input() user: any = {
+    userId: null,
+    userName: '',
+    userUsername: '',
+    userBalance: 0,
+  };
+
+  // Output properties to emit events when the modal is closed or saved
+  @Output() close = new EventEmitter<void>();
+  @Output() save = new EventEmitter<any>();
+
+  /**
+   * Close the modal.
+   */
+  closeModal(): void {
+    this.close.emit();
+  }
+
+  /**
+   * Save the user details and emit the save event.
+   */
+  saveUser(): void {
+    if (this.isFormValid()) {
+      this.save.emit(this.user);
+      this.closeModal(); // Close the modal after saving
+    } else {
+      alert('Please fill in all fields correctly.');
+    }
+  }
+
+  /**
+   * Check if the form is valid.
+   */
+  private isFormValid(): boolean {
+    return (
+      this.user.userName.trim() !== '' &&
+      this.user.userUsername.trim() !== '' &&
+      this.user.userBalance >= 0
+    );
+  }
+}
 
