@@ -1,0 +1,110 @@
+admin-header.component.html
+--------------------------------
+<div class="w-full h-[70px] bg-black text-white flex items-center justify-between px-5 shadow-md">
+  <div class="text-lg font-bold">
+    Admin Dashboard
+  </div>
+  <div class="flex items-center gap-5">
+    <button class="text-white px-4 py-2 bg-gray-700 rounded hover:bg-gray-800">
+      <a routerLink="/admin/users">Manage Users</a>
+    </button>
+    <button class="text-white px-4 py-2 bg-gray-700 rounded hover:bg-gray-800">
+      <a routerLink="/admin/transactions">Transactions</a>
+    </button>
+    <button class="text-white px-4 py-2 bg-red-600 rounded hover:bg-red-700">
+      <a routerLink="/login">Logout</a>
+    </button>
+  </div>
+</div>
+
+
+----------------------------------
+<div class="w-full h-[calc(100vh-70px)] bg-gray-100 p-5">
+  <!-- CRUD Table Section -->
+  <div class="w-full bg-white rounded-md shadow-md p-4">
+    <h2 class="text-xl font-semibold mb-4">User Management</h2>
+    <div class="mb-4 flex justify-end">
+      <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" (click)="openCreateModal()">
+        Add User
+      </button>
+    </div>
+    <table class="table-auto w-full border-collapse border border-gray-300">
+      <thead>
+        <tr class="bg-gray-200 text-left">
+          <th class="border border-gray-300 px-4 py-2">ID</th>
+          <th class="border border-gray-300 px-4 py-2">Name</th>
+          <th class="border border-gray-300 px-4 py-2">Username</th>
+          <th class="border border-gray-300 px-4 py-2">Balance</th>
+          <th class="border border-gray-300 px-4 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users" class="hover:bg-gray-100">
+          <td class="border border-gray-300 px-4 py-2">{{ user.customerId }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ user.customerName }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ user.customerUsername }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ user.customerBalance }}</td>
+          <td class="border border-gray-300 px-4 py-2">
+            <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="editUser(user)">
+              Edit
+            </button>
+            <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 ml-2" (click)="deleteUser(user.customerId)">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+---------------
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Component({
+  selector: 'app-admin',
+  templateUrl: './admin.component.html',
+  styleUrls: ['./admin.component.css'],
+})
+export class AdminComponent implements OnInit {
+  users: any[] = [];
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.getAllUsers();
+  }
+
+  getAllUsers() {
+    this.http.get<any[]>('http://localhost:8099/customer/get').subscribe(
+      (data) => {
+        this.users = data;
+      },
+      (error) => {
+        console.error('Error fetching users:', error);
+      }
+    );
+  }
+
+  deleteUser(userId: number) {
+    this.http.delete(`http://localhost:8099/customer/delete/${userId}`).subscribe(
+      () => {
+        this.users = this.users.filter((user) => user.customerId !== userId);
+      },
+      (error) => {
+        console.error('Error deleting user:', error);
+      }
+    );
+  }
+
+  editUser(user: any) {
+    // Logic to open edit modal and update user details
+  }
+
+  openCreateModal() {
+    // Logic to open modal for creating a new user
+  }
+}
+
